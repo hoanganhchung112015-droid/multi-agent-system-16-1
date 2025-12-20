@@ -5,7 +5,7 @@ import remarkMath from 'remark-math';
 import rehypeKatex from 'rehype-katex';
 import { Subject, AgentType } from '../types';
 import { Layout } from '../components/Layout';
-import { processTask, generateSimilarQuiz, fetchTTSAudio, playStoredAudio, generateSummary } from '../services/geminiService';
+import { processTask, generateSimilarQuiz, fetchTTSAudio, playStoredAudio, generateSummary } from '../services/geminiService.ts';
 
 interface DiaryEntry {
   date: string;
