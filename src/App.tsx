@@ -114,4 +114,85 @@ const App: React.FC = () => {
                 onClick={() => { setSelectedSubject(sub as Subject); setScreen(sub === Subject.DIARY ? 'DIARY' : 'INPUT'); }}
                 className="h-40 bg-white/10 backdrop-blur-md border border-white/20 rounded-[2.5rem] shadow-2xl flex flex-col items-center justify-center hover:scale-105 active:scale-95 transition-all group"
              >
-               <span className="text-4xl group-hover:bounce mb
+               <span className="text-4xl group-hover:bounce mb-2">
+                {sub === Subject.MATH ? '📐' : sub === Subject.PHYSICS ? '⚛️' : sub === Subject.CHEMISTRY ? '🧪' : '📔'}
+               </span>
+               <span className="font-black text-blue-900 uppercase tracking-tighter">{sub}</span>
+             </button>
+           ))}
+        </div>
+      )}
+
+      {screen === 'INPUT' && (
+        <div className="p-6 space-y-8 animate-in fade-in">
+          <div className="relative group">
+            <textarea 
+              value={voiceText}
+              onChange={(e) => setVoiceText(e.target.value)}
+              placeholder="Nhập đề bài hoặc dùng camera..."
+              className="w-full h-48 p-6 bg-white rounded-[2rem] border-2 border-blue-50 focus:border-blue-400 outline-none shadow-inner text-lg font-medium resize-none transition-all"
+            />
+            <button 
+              onClick={handleRunAnalysis}
+              className="absolute bottom-4 right-4 bg-blue-600 text-white px-8 py-3 rounded-2xl font-black shadow-lg hover:bg-blue-700 active:scale-95 transition-all"
+            >
+              GIẢI NGAY 🚀
+            </button>
+          </div>
+        </div>
+      )}
+
+      {screen === 'ANALYSIS' && (
+        <div className="space-y-4 p-4">
+          {/* Tabs chuyển đổi Agent siêu mượt */}
+          <div className="flex overflow-x-auto gap-2 no-scrollbar pb-2">
+            {Object.values(AgentType).map((ag) => (
+              <button 
+                key={ag}
+                onClick={() => setSelectedAgent(ag)}
+                className={`px-6 py-2 rounded-full whitespace-nowrap font-black text-[10px] uppercase tracking-widest transition-all ${selectedAgent === ag ? 'bg-blue-600 text-white shadow-md' : 'bg-white text-slate-400'}`}
+              >
+                {ag} {allResults[ag] && "✓"}
+              </button>
+            ))}
+          </div>
+
+          <div className="bg-white rounded-[2.5rem] p-8 shadow-2xl min-h-[400px] relative overflow-hidden">
+            {/* Hiển thị Skeleton nếu đang load mà chưa có chữ nào */}
+            {loading && !allResults[selectedAgent] ? (
+              <SkeletonLoader />
+            ) : (
+              <div className="prose prose-blue animate-in fade-in duration-1000">
+                <ReactMarkdown remarkPlugins={[remarkMath]} rehypePlugins={[rehypeKatex]}>
+                  {selectedAgent === AgentType.SPEED && parsedSpeedResult 
+                    ? parsedSpeedResult.finalAnswer 
+                    : allResults[selectedAgent] || "Đang phân tích dữ liệu..."}
+                </ReactMarkdown>
+                
+                {/* Hiển thị Casio mượt mà */}
+                {selectedAgent === AgentType.SPEED && parsedSpeedResult?.casioSteps && (
+                  <div className="mt-6 p-5 bg-emerald-50 rounded-3xl border border-emerald-100 animate-in slide-in-from-right">
+                    <h4 className="text-emerald-700 font-black text-xs uppercase mb-2">⌨️ Hướng dẫn Casio 580</h4>
+                    <pre className="text-emerald-900 font-mono text-sm whitespace-pre-wrap">{parsedSpeedResult.casioSteps}</pre>
+                  </div>
+                )}
+              </div>
+            )}
+            
+            {/* Nút đọc âm thanh góc dưới */}
+            {allAudios[selectedAgent] && (
+              <button 
+                onClick={async () => { setIsSpeaking(true); await playStoredAudio(allAudios[selectedAgent]!, audioSourceRef); setIsSpeaking(false); }}
+                className={`absolute bottom-6 right-6 p-4 rounded-full shadow-lg transition-all ${isSpeaking ? 'bg-red-500 animate-pulse' : 'bg-blue-600 hover:scale-110'}`}
+              >
+                {isSpeaking ? '⏹️' : '🔊'}
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+    </Layout>
+  );
+};
+
+export default App;
