@@ -15,8 +15,10 @@ const audioCache = new Map<string, string>();
 const getCacheKey = (subject: string, agent: string, input: string, imageHash: string = '') => 
   `${subject}|${agent}|${input.trim()}|${imageHash}`;
 
-// Sử dụng biến môi trường chuẩn của Vite
-const ai = new GoogleGenAI({ apiKey: import.meta.env.VITE_GEMINI_API_KEY });
+// Khai báo API Key bằng chuẩn Vite
+const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
+const genAI = new GoogleGenerativeAI(API_KEY);
+
 
 const SYSTEM_PROMPTS: Record<AgentType, string> = {
   [AgentType.SPEED]: `Bạn là chuyên gia giải đề thi THPT Quốc gia. Trả về JSON: {"finalAnswer": "...", "casioSteps": "..."}. Ngắn gọn, dùng LaTeX.`,
