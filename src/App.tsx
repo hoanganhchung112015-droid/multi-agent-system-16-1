@@ -6,7 +6,7 @@ import { Subject, AgentType } from '../types';
 import { Layout } from '../components/Layout';
 import { 
   executeMultiAgentParallel, 
-  generateSimilarQuiz, 
+ 
   fetchTTSAudio, 
   playStoredAudio, 
   generateSummary 
@@ -78,26 +78,7 @@ useEffect(() => {
       // CHỈ CHẠY KHI: Đã xong loading + Có kết quả + Chưa có Quiz
       if (!loading && finalSpeed && !quiz) {
         
-        // 1. Tạo câu hỏi Quiz (Dùng await thay vì .then)
-        const newQuiz = await generateSimilarQuiz(finalSpeed);
-        if (newQuiz) setQuiz(newQuiz);
-        
-        // 2. Tạo tóm tắt và lấy âm thanh
-        const summary = await generateSummary(finalSpeed);
-        if (summary) {
-          const audio = await fetchTTSAudio(summary);
-          if (audio) {
-            setAllAudios(prev => ({ ...prev, [AgentType.SPEED]: audio }));
-          }
-        }
-      }
-    };
-
-    handleExtraTasks();
-  }, [loading, allResults, quiz]);  
-
-
-  return { allResults, allAudios, parsedSpeedResult, loading, quiz, resetResults, runAgents };
+          return { allResults, allAudios, parsedSpeedResult, loading, quiz, resetResults, runAgents };
 // --- VIEW LAYER ---
 const App: React.FC = () => {
   const [screen, setScreen] = useState<'HOME' | 'INPUT' | 'ANALYSIS' | 'DIARY'>('HOME');
