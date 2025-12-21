@@ -1,32 +1,26 @@
-import path from 'path';
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
+import path from 'path';
 
 export default defineConfig({
-  server: {
-    port: 3000,
-    host: '0.0.0.0',
-  },
   plugins: [react()],
-  define: {
-    // Không ghi đè từng biến lẻ, chỉ cung cấp một đối tượng trống để tránh lỗi tham chiếu
-    'process.env': {}
-  },
   resolve: {
     alias: {
-      // Thiết lập alias chuẩn để tránh lỗi import đường dẫn
       '@': path.resolve(__dirname, './src'),
     },
   },
+  define: {
+    // Thay vì để trống, hãy ép kiểu rõ ràng để Rollup không bị bối rối
+    'process.env': '({})',
+    'global': 'window',
+  },
   build: {
-    // Tối ưu hóa việc đóng gói để tăng tốc độ load app
+    // Tắt tính năng minify của Rollup nếu nó vẫn báo lỗi AST (để debug)
+    // Sau khi chạy được bạn có thể bật lại (set về true hoặc 'esbuild')
+    minify: 'esbuild',
     rollupOptions: {
-      output: {
-        manualChunks: {
-          vendor: ['react', 'react-dom', 'react-markdown'],
-        },
-      },
-    },
-    chunkSizeWarningLimit: 1000,
+      // Đảm bảo Rollup không cố gắng bundle các module Node.js vào Client
+      external: [],
+    }
   }
 });
