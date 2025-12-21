@@ -5,7 +5,7 @@ import react from '@vitejs/plugin-react';
 export default defineConfig({
   plugins: [react()],
   define: {
-    // Lưu ý: Phải bọc trong JSON.stringify để Vite hiểu đây là một chuỗi giá trị literal
+    // Dùng JSON.stringify để đảm bảo giá trị là một JS literal hợp lệ
     'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify({}),
     'global': 'window',
   },
@@ -15,9 +15,17 @@ export default defineConfig({
     },
   },
   build: {
-    // Tối ưu hóa build để tránh lỗi AST
+    // Tăng cường khả năng tương thích giữa CommonJS và ESM
     commonjsOptions: {
       transformMixedEsModules: true,
     },
-  }
+    // Giúp Rollup xử lý mượt mà hơn các thư viện bên thứ 3
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-markdown'],
+        },
+      },
+    },
+  },
 });
