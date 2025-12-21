@@ -10,7 +10,7 @@ import {
   fetchTTSAudio, 
   playStoredAudio, 
   generateSummary 
-} from '../services/geminiService.ts';
+} from '../services/geminiService';
 
 // --- UI COMPONENT: Skeleton Loader cho cảm giác "Siêu tốc độ" ---
 const SkeletonLoader = () => (
