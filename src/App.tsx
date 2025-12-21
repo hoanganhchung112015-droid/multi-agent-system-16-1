@@ -42,75 +42,59 @@ const useAgentSystem = (selectedSubject: Subject | null) => {
     setLoading(false);
   }, []);
 
-  const runAgents = useCallback(async (voiceText: string, image: string | null) => {
+ const runAgents = useCallback(async (voiceText: string, image: string | null) => {
     if (!selectedSubject || (!image && !voiceText)) return;
 
     setLoading(true);
-    resetResults();
+    resetResults(); // Xóa kết quả cũ để chuẩn bị nhận kết quả mới
 
-    // Thực thi tất cả Agent song song với cơ chế Streaming
+    // Gọi AI giải bài (Streaming)
     await executeMultiAgentParallel(
       selectedSubject,
       voiceText,
       (agent, content) => {
         setAllResults(prev => ({ ...prev, [agent]: content }));
         
-        // Nếu là Agent SPEED, thử parse JSON ngay khi stream xong (hoặc có đủ dữ liệu)
-        if (agent === AgentType.SPEED) {
-          try {
-            const cleanContent = content.replace(/```json|```/g, '').trim();
-            const parsed = JSON.parse(cleanContent);
-            setParsedSpeedResult(parsed);
-          } catch (e) { /* Đang stream JSON chưa hoàn chỉnh */ }
-        }
-      },
-      image || undefined
-    );
-
-    setLoading(false);
-
-    // 1. Hàm chạy AI: CHỈ làm nhiệm vụ lấy dữ liệu, KHÔNG xử lý hậu kỳ
-  const runAgents = useCallback(async (voiceText: string, image: string | null) => {
-    if (!selectedSubject || (!image && !voiceText)) return;
-
-    setLoading(true);
-    resetResults();
-
-    await executeMultiAgentParallel(
-      selectedSubject,
-      voiceText,
-      (agent, content) => {
-        setAllResults(prev => ({ ...prev, [agent]: content }));
+        // Chỉ xử lý JSON cho Agent SPEED
         if (agent === AgentType.SPEED) {
           try {
             const cleanContent = content.replace(/```json|```/g, '').trim();
             setParsedSpeedResult(JSON.parse(cleanContent));
-          } catch (e) { /* Đang stream dở dang, bỏ qua */ }
+          } catch (e) { 
+            /* Bỏ qua lỗi parse khi đang stream dở dang */ 
+          }
         }
       },
       image || undefined
     );
-    setLoading(false);
-  }, [selectedSubject, resetResults]); // <--- TUYỆT ĐỐI KHÔNG để allResults ở đây
 
-  // 2. Xử lý hậu kỳ: CHỈ chạy khi AI đã hoàn thành (loading = false)
-  useEffect(() => {
-    const finalSpeed = allResults[AgentType.SPEED];
-    
-    // Điều kiện: Đã xong loading, có kết quả, và chưa có Quiz (để tránh chạy lại)
-    if (!loading && finalSpeed && !quiz) {
-      generateSimilarQuiz(finalSpeed).then(q => q && setQuiz(q));
+    setLoading(false); // Đánh dấu là AI đã giải xong
+  }, [selectedSubject, resetResults]);
+
+useEffect(() => {
+    const handleExtraTasks = async () => {
+      const finalSpeed = allResults[AgentType.SPEED];
       
-      generateSummary(finalSpeed).then(sum => {
-        if (sum) {
-          fetchTTSAudio(sum).then(aud => {
-            if (aud) setAllAudios(p => ({...p, [AgentType.SPEED]: aud}));
-          });
+      // CHỈ CHẠY KHI: Đã xong loading + Có kết quả + Chưa có Quiz
+      if (!loading && finalSpeed && !quiz) {
+        
+        // 1. Tạo câu hỏi Quiz (Dùng await thay vì .then)
+        const newQuiz = await generateSimilarQuiz(finalSpeed);
+        if (newQuiz) setQuiz(newQuiz);
+        
+        // 2. Tạo tóm tắt và lấy âm thanh
+        const summary = await generateSummary(finalSpeed);
+        if (summary) {
+          const audio = await fetchTTSAudio(summary);
+          if (audio) {
+            setAllAudios(prev => ({ ...prev, [AgentType.SPEED]: audio }));
+          }
         }
-      });
-    }
-  }, [loading, allResults, quiz]); // <--- Theo dõi loading để biết khi nào AI dừng lại
+      }
+    };
 
+    handleExtraTasks();
+  }, [loading, allResults, quiz]);  
 
     
 // --- VIEW LAYER ---
