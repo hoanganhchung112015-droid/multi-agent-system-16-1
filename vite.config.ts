@@ -10,15 +10,8 @@ export default defineConfig({
     },
   },
   define: {
-    // Sử dụng JSON.stringify để biến {} thành một chuỗi literal hợp lệ
-    // Giúp triệt tiêu lỗi "Invalid define value" và lỗi "parseAst"
-    'import.meta.env.VITE_GEMINI_API_KEY': JSON.stringify({}),
+    // Cách này giúp "đánh lừa" Rollup, để nó không đi tìm biến process nữa
+    'import.meta.env.VITE_GEMINI_API_KEY': '{}', 
     'global': 'window',
-  },
-  build: {
-    minify: 'esbuild',
-    rollupOptions: {
-      external: [],
-    }
   }
 });
