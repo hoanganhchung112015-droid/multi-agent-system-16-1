@@ -68,20 +68,51 @@ const useAgentSystem = (selectedSubject: Subject | null) => {
     );
 
     setLoading(false);
-    
-    // Sau khi có kết quả, chạy ngầm các dịch vụ bổ trợ (Quiz, TTS) để tối ưu "Siêu bền"
+
+    // 1. Hàm chạy AI: CHỈ làm nhiệm vụ lấy dữ liệu, KHÔNG xử lý hậu kỳ
+  const runAgents = useCallback(async (voiceText: string, image: string | null) => {
+    if (!selectedSubject || (!image && !voiceText)) return;
+
+    setLoading(true);
+    resetResults();
+
+    await executeMultiAgentParallel(
+      selectedSubject,
+      voiceText,
+      (agent, content) => {
+        setAllResults(prev => ({ ...prev, [agent]: content }));
+        if (agent === AgentType.SPEED) {
+          try {
+            const cleanContent = content.replace(/```json|```/g, '').trim();
+            setParsedSpeedResult(JSON.parse(cleanContent));
+          } catch (e) { /* Đang stream dở dang, bỏ qua */ }
+        }
+      },
+      image || undefined
+    );
+    setLoading(false);
+  }, [selectedSubject, resetResults]); // <--- TUYỆT ĐỐI KHÔNG để allResults ở đây
+
+  // 2. Xử lý hậu kỳ: CHỈ chạy khi AI đã hoàn thành (loading = false)
+  useEffect(() => {
     const finalSpeed = allResults[AgentType.SPEED];
-    if (finalSpeed) {
-        generateSimilarQuiz(finalSpeed).then(q => q && setQuiz(q));
-        generateSummary(finalSpeed).then(sum => 
-          sum && fetchTTSAudio(sum).then(aud => aud && setAllAudios(p => ({...p, [AgentType.SPEED]: aud})))
-        );
+    
+    // Điều kiện: Đã xong loading, có kết quả, và chưa có Quiz (để tránh chạy lại)
+    if (!loading && finalSpeed && !quiz) {
+      generateSimilarQuiz(finalSpeed).then(q => q && setQuiz(q));
+      
+      generateSummary(finalSpeed).then(sum => {
+        if (sum) {
+          fetchTTSAudio(sum).then(aud => {
+            if (aud) setAllAudios(p => ({...p, [AgentType.SPEED]: aud}));
+          });
+        }
+      });
     }
-  }, [selectedSubject, allResults, resetResults]);
+  }, [loading, allResults, quiz]); // <--- Theo dõi loading để biết khi nào AI dừng lại
 
-  return { allResults, allAudios, parsedSpeedResult, loading, quiz, resetResults, runAgents };
-};
 
+    
 // --- VIEW LAYER ---
 const App: React.FC = () => {
   const [screen, setScreen] = useState<'HOME' | 'INPUT' | 'ANALYSIS' | 'DIARY'>('HOME');
