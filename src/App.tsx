@@ -32,8 +32,7 @@ const useAgentSystem = (selectedSubject: Subject | null) => {
   const [allAudios, setAllAudios] = useState<Partial<Record<AgentType, string>>>({});
   const [parsedSpeedResult, setParsedSpeedResult] = useState<{ finalAnswer: string, casioSteps: string } | null>(null);
   const [loading, setLoading] = useState(false);
-  const [quiz, setQuiz] = useState<any>(null);
-  
+ 
   const resetResults = useCallback(() => {
     setAllResults({});
     setAllAudios({});
