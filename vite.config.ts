@@ -11,7 +11,7 @@ export default defineConfig({
   },
   define: {
     // Thay vì để trống, hãy ép kiểu rõ ràng để Rollup không bị bối rối
-    'process.env': '({})',
+    'import.meta.env.VITE_GEMINI_API_KEY': '({})',
     'global': 'window',
   },
   build: {
