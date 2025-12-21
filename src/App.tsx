@@ -96,7 +96,8 @@ useEffect(() => {
     handleExtraTasks();
   }, [loading, allResults, quiz]);  
 
-    
+
+  return { allResults, allAudios, parsedSpeedResult, loading, quiz, resetResults, runAgents };
 // --- VIEW LAYER ---
 const App: React.FC = () => {
   const [screen, setScreen] = useState<'HOME' | 'INPUT' | 'ANALYSIS' | 'DIARY'>('HOME');
