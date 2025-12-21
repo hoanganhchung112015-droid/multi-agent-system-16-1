@@ -161,19 +161,3 @@ export const playStoredAudio = async (base64Audio: string, audioSourceRef: React
     source.start(); 
   });
 };
-export const generateSimilarQuiz = async (content: string) => {
-  try {
-    const model = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
-    const prompt = `Dựa trên nội dung bài giải sau, hãy tạo 1 câu hỏi trắc nghiệm tương tự (kèm 4 đáp án A, B, C, D). 
-    Trả về định dạng JSON: {"question": "...", "options": ["A...", "B...", "C...", "D..."], "correct": "A"}.
-    Nội dung: ${content}`;
-
-    const result = await model.generateContent(prompt);
-    const text = result.response.text();
-    const cleanJson = text.replace(/```json|```/g, '').trim();
-    return JSON.parse(cleanJson);
-  } catch (error) {
-    console.error("Lỗi tạo Quiz:", error);
-    return null;
-  }
-};
