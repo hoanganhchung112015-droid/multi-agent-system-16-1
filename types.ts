@@ -7,11 +7,9 @@ export enum Subject {
 }
 
 export enum AgentType {
-  SPEED = 'Speed',
-  SOCRATIC = 'Socratic',
-  NOTEBOOK = 'NotebookLM',
-  PERPLEXITY = 'Perplexity',
-  // CASIO = 'Casio 580' // Đã bị xóa
+  SPEED = 'Giải nhanh+Casio',
+  SOCRATIC = 'Gia sư AI',
+  PERPLEXITY = 'Luyện Skill',
 }
 
 export interface QuizQuestion {
