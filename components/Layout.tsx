@@ -37,7 +37,7 @@ export const Layout: React.FC<LayoutProps> = React.memo(({ children, onBack, tit
         )}
         <div className="space-y-1">
           <h1 className="text-2xl font-black tracking-tighter text-slate-900 uppercase">Symbiotic AI</h1>
-          <h2 className="text-sm font-bold text-slate-400 tracking-widest uppercase">Multi Agent Systems</h2>
+          <h2 className="text-sm font-bold text-slate-400 tracking-widest uppercase">Multi Agent Systems 16.5</h2>
           <p className="text-xs font-medium text-indigo-600 mt-1 italic">Gia sư ảo thông minh của mọi thế hệ học sinh</p>
           {title && (
             <div className="pt-4 flex justify-center">
