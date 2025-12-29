@@ -3,6 +3,7 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
 const MODEL_NAME = "gemini-1.5-flash";
+const model = genAI.getGenerativeModel({ model: MODEL_NAME });
 
 const SYSTEM_PROMPTS = {
   [AgentType.SPEED]: "Giải bài tập trắc nghiệm. Trả về định dạng JSON: {\"finalAnswer\": \"...\", \"casioSteps\": \"...\"}. Dùng LaTeX cho công thức.",
