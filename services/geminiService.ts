@@ -2,12 +2,11 @@ import { GoogleGenerativeAI } from "@google/generative-ai";
 
 const API_KEY = import.meta.env.VITE_GEMINI_API_KEY;
 const genAI = new GoogleGenerativeAI(API_KEY);
-const MODEL_NAME = "gemini-1.5-flash";
+const MODEL_NAME = "gemini-2.5-flash";
 
 const SYSTEM_PROMPTS = {
   [AgentType.SPEED]: "Giải bài tập trắc nghiệm. Trả về định dạng JSON: {\"finalAnswer\": \"...\", \"casioSteps\": \"...\"}. Dùng LaTeX cho công thức.",
   [AgentType.SOCRATIC]: "Hãy đóng vai trò là Socratic, Giải chi tiết, giảng giải từng bước khoa học. Dùng LaTeX.",
-  [AgentType.NOTEBOOK]: "Hãy đóng vai trò là NotebookLM, Tóm tắt 5 kiến thức trọng tâm cần nhớ của bài này. Dùng LaTeX.",
   [AgentType.PERPLEXITY]: "Đề xuất 2 bài tập nâng cao tương tự đề bài này. Dùng LaTeX."
 };
 
